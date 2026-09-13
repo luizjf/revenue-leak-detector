@@ -9,6 +9,7 @@
 |---|---|---|
 | `contrato-de-dados.md` | **especificação** — campos, tipo na origem, obrigatoriedade, chave, limites de aceitação | 1.3 |
 | `adr/0001` … `adr/0004` | **decisão** — Contexto / Decisão / Consequências | 1.4 |
+| `parametros-e-cenarios.md` | **estratégia** — estrutura de negócio, faixas do funil, os 10 cenários e as 7 armadilhas | 1.5 |
 | `amostras/` | recorte curto de cada arquivo de `raw/`, escrito pelo próprio exportador | 1.7 |
 
 A distinção entre as duas primeiras linhas é o motivo desta pasta existir:

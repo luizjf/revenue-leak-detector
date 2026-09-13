@@ -1,0 +1,33 @@
+[project]
+name = "revenue-leak-detector"
+version = "0.1.0"
+description = "Diagnóstico de vazamento de receita em funis de marketing digital"
+requires-python = ">=3.14"
+
+[dependency-groups]
+# Instalação: py -m pip install --group dev
+# Dependência entra na fase em que é usada, não antes — declarar `dbt-duckdb`
+# hoje faria o primeiro install falhar por um problema da Fase 2.
+dev = [
+    "ruff>=0.9",
+    "pytest>=8.0",
+]
+# A entrar: pandas, numpy (etapa 1.5) · duckdb, dbt-duckdb, sqlfluff (Fase 2)
+# · streamlit (Fase 4).
+
+[tool.ruff]
+line-length = 100          # português é mais longo que inglês; 88 apertaria comentário
+target-version = "py314"   # linta contra a stack declarada, não contra o interpretador local
+exclude = ["raw", "transform/target", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "N", "RUF"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]         # substitui o packaging: import funciona a partir da raiz
+addopts = "-q --strict-markers"
+markers = [
+    "lento: rodada longa do conjunto cego (etapa 3.6) — pular com -m 'not lento'",
+]

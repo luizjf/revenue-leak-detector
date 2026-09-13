@@ -11,6 +11,7 @@ FRONTEIRA: nenhum valor aqui pode vir de um limiar do motor — seção 1, regra
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import date, timedelta, timezone
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Final
@@ -30,6 +31,19 @@ class Janela:
 
 # maturacao=30 vem da ADR 0001: coorte imatura não entra em comparação de CAC.
 JANELA_PADRAO: Final[Janela] = Janela(baseline=60, analisado=30, maturacao=30)
+
+# Âncora fixa do calendário. Sem ela, gerar("normal", 42) mudaria de resultado
+# a cada dia e o critério de saída da etapa 1.6 quebraria sozinho.
+# Segunda-feira de propósito: começar no meio da semana desequilibraria ainda
+# mais a contagem de fins de semana entre os dois períodos. Resta um viés de
+# -1,7% no volume do período analisado (60 e 30 não são múltiplos de 7) —
+# declarado, não corrigido: está abaixo do ruído diário de ±18%.
+DATA_INICIO_BASELINE: Final[date] = date(2026, 3, 2)
+
+# O CRM entrega ISO 8601 com -03:00 (docs/contrato-de-dados.md, seção 4).
+# Timestamp com fuso desde a origem: datetime "ingênuo" que só por convenção
+# significa -03:00 é uma convenção que nenhum teste verifica.
+FUSO_BRASILIA: Final[timezone] = timezone(timedelta(hours=-3))
 
 
 class Estagio(StrEnum):
@@ -211,6 +225,28 @@ class Funil:
 # Conversão ponta a ponta = produto das três taxas ≈ 0,047.
 # `toques_ate_perda_mediana` é MEDIANA, não constante: se todo perdido levasse
 # 4 toques, a R7 (perdidos com menos de 3) não teria o que detectar.
+@dataclass(frozen=True)
+class Operacao:
+    """Falhas operacionais no estado NORMAL. Arbitradas.
+
+    São a BASE que os cenários 4 (`sla_estourado`), 7 (`pipeline_parado`) e 8
+    (`follow_up_insuficiente`) substituem. Sem elas declaradas, o cenário
+    perturbado não teria contra o que ser comparado — e o `normal` teria
+    operação perfeita, que não existe em conta nenhuma.
+    """
+
+    alto_fit_fora_sla: float
+    negocios_parados: float
+    perdidos_ate_2_toques: float
+
+
+OPERACAO_BASE: Final[Operacao] = Operacao(
+    alto_fit_fora_sla=0.12,
+    negocios_parados=0.15,
+    perdidos_ate_2_toques=0.15,  # a estratégia já citava estes 15%
+)
+
+
 FUNIL_BASE: Final[Funil] = Funil(
     taxa_lead_qualificado=0.35,
     taxa_qualificado_proposta=0.45,

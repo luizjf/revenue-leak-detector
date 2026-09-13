@@ -11,9 +11,11 @@ requires-python = ">=3.14"
 dev = [
     "ruff>=0.9",
     "pytest>=8.0",
+    "numpy>=2.2",
+    "pandas>=3.0",
 ]
-# A entrar: pandas, numpy (etapa 1.5) · duckdb, dbt-duckdb, sqlfluff (Fase 2)
-# · streamlit (Fase 4).
+# numpy entrou na 1.6 (gerador); pandas entra na 1.7 (exportador).
+# A entrar: duckdb, dbt-duckdb, sqlfluff (Fase 2) · streamlit (Fase 4).
 
 [tool.ruff]
 line-length = 100          # português é mais longo que inglês; 88 apertaria comentário

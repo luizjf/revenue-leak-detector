@@ -61,9 +61,7 @@ Agência de performance, **12 contas ativas**, **um canal de mídia por conta**
 | 09 | `saas_gestor_pro` | Software B2B | 7.400 | 14 | 95 | 0,55 | 24 d |
 | 10 | `saas_fluxo` | Software B2B | 4.900 | 16 | 70 | 0,58 | 20 d |
 | 11 | `clinica_vitalis` | Saúde | 8.200 | 10 | 105 | 0,35 | 22 d |
-| 12 | `solar_energia_ma` | Energia solar | 12.500 | 13 | 115 | 0,24 | 42 d |
-
-Ticket entre R$ 3,2 mil e R$ 14 mil, dentro da faixa do `CLAUDE.md` seção 2.
+| 12 | `solar_energia_ma` | Energia solar | 12.500 | 13 | 115 | 0,24 | 42 d 
 
 **Por que a variedade importa:** se as 12 contas fossem parecidas, um limiar
 único funcionaria e o projeto não provaria nada. A dispersão de ticket (4x), de
@@ -81,7 +79,7 @@ por campanha) e para o paradoxo de Simpson poder existir.
 | `taxa_qualificado_proposta` | 0,45 | qualificado a proposta |
 | `taxa_proposta_ganho` | 0,30 | proposta a ganho |
 | **conversão ponta a ponta** | **≈ 0,047** | produto das três |
-| `distribuicao_lag` | lognormal | mediana por conta (tabela acima); p90 ≈ 2,2 x mediana; cauda truncada em 90 dias |
+| `distribuicao_lag` | lognormal | mediana por conta (tabela acima); p90 ≈ 2,2 x mediana; cauda truncada em **120 dias** |
 | `sla_primeiro_contato` | 60 min (`score_fit` ≥ 70) · 4 h (40 a 69) · 24 h (< 40) | usado pela R3 |
 | `sla_por_estagio` | 3 d `novo` · 5 d `contato_feito` · 7 d `qualificado` · 10 d `proposta` · 14 d `negociacao` | usado pela R6 |
 | `toques_ate_perda` | mediana 4, mínimo 0 | usado pela R7 |
@@ -101,6 +99,22 @@ por campanha) e para o paradoxo de Simpson poder existir.
 Os 30 dias finais **não geram leads novos** — existem apenas para os leads do
 período analisado terem tempo de fechar. Sem eles, a coorte final nunca amadurece
 e o período analisado nasce vazio (ADR 0001).
+
+> **Tensão declarada, encontrada pelo teste `test_lag_cabe_dentro_do_corte`:**
+> a maturação da ADR 0001 é de 30 dias, mas três contas têm lag mediano acima
+> disso — `construtora_horizonte` (38 d), `imob_costa_verde` (34 d) e
+> `solar_energia_ma` (42 d). Nelas, a maior parte da receita de uma coorte ainda
+> não fechou quando a coorte é declarada madura.
+>
+> **Isso não é bug e não reabre a ADR 0001.** É o comportamento correto: ciclo
+> longo com janela de 30 dias genuinamente não permite afirmar nada, e o produto
+> deve **dizer isso** em vez de responder. Essas contas devem cair na R99 e na
+> flag de imaturidade da etapa 2.3 com mais frequência que as demais — e isso é
+> um resultado a verificar na fase 3, não um defeito a corrigir na fase 1.
+>
+> A truncagem foi movida de 90 para 120 dias porque o p90 da conta solar é 92 d:
+> cortar em 90 amputava a cauda abaixo do próprio p90. Negócio que não fecha
+> dentro da janela permanece `aberto`, e é insumo legítimo da R6.
 
 ---
 

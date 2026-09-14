@@ -159,3 +159,15 @@ def test_lag_respeita_o_corte():
     amostra = [_sortear_lag(42, rng) for _ in range(10_000)]
     assert max(amostra) <= DISTRIBUICAO_LAG.corte_dias
     assert min(amostra) >= 0
+
+
+# --------------------------------------------------------------------------
+# Metricas de midia (contrato 5.1)
+# --------------------------------------------------------------------------
+def test_cliques_nunca_passam_das_impressoes(normal):
+    """Limite de aceitacao contraditorio do contrato: clique sem impressao e
+    impossivel. Barato de testar e pega dado corrompido."""
+    for conta in normal.dados:
+        for custo in conta.custos:
+            assert custo.cliques <= custo.impressoes, custo.campanha_id
+            assert custo.impressoes >= 0 and custo.cliques >= 0

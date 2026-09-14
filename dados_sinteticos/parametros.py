@@ -226,6 +226,26 @@ class Funil:
 # `toques_ate_perda_mediana` é MEDIANA, não constante: se todo perdido levasse
 # 4 toques, a R7 (perdidos com menos de 3) não teria o que detectar.
 @dataclass(frozen=True)
+class Midia:
+    """Métricas de topo de funil que a Graph API entrega. Arbitradas.
+
+    NENHUMA REGRA DO MOTOR USA ESTES DOIS CAMPOS. Eles existem porque a API os
+    devolve e porque `clicks <= impressions` é um limite de aceitação barato
+    que pega dado corrompido (contrato, 5.1). São derivados do volume de leads
+    para manter coerência interna: um dia com mais leads tem mais cliques.
+
+    Moram no gerador, e não no exportador, porque são CONTEÚDO — o exportador
+    formata, não inventa.
+    """
+
+    ctr: float  # cliques / impressões
+    taxa_clique_para_lead: float  # leads / cliques
+
+
+MIDIA_BASE: Final[Midia] = Midia(ctr=0.018, taxa_clique_para_lead=0.12)
+
+
+@dataclass(frozen=True)
 class Operacao:
     """Falhas operacionais no estado NORMAL. Arbitradas.
 

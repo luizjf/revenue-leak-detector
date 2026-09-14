@@ -27,6 +27,7 @@ from dados_sinteticos.parametros import (
     FUNIL_BASE,
     FUSO_BRASILIA,
     JANELA_PADRAO,
+    MIDIA_BASE,
     OPERACAO_BASE,
     RUIDO,
     SEMENTE_PADRAO,
@@ -87,6 +88,8 @@ class Custo:
     campanha_id: str
     dia: date
     valor: float
+    impressoes: int
+    cliques: int
 
 
 @dataclass(frozen=True)
@@ -417,15 +420,25 @@ def _custo_do_dia(
     for lead in leads:
         contagem[lead.campanha_id] += 1
 
-    return [
-        Custo(
-            conta_id=conta.id,
-            campanha_id=campanha,
-            dia=dia,
-            valor=round(contagem[campanha] * params["cpl"] * float(fator), 2),
+    linhas: list[Custo] = []
+    for campanha, fator in zip(campanhas, fatores, strict=True):
+        n_leads = contagem[campanha]
+        # Derivadas do volume de leads, sem sorteio: um dia com mais leads teve
+        # mais cliques. `ceil` garante cliques >= leads e impressoes >= cliques,
+        # que é o limite de aceitação `clicks <= impressions` do contrato 5.1.
+        cliques = math.ceil(n_leads / MIDIA_BASE.taxa_clique_para_lead)
+        impressoes = math.ceil(cliques / MIDIA_BASE.ctr)
+        linhas.append(
+            Custo(
+                conta_id=conta.id,
+                campanha_id=campanha,
+                dia=dia,
+                valor=round(n_leads * params["cpl"] * float(fator), 2),
+                impressoes=impressoes,
+                cliques=cliques,
+            )
         )
-        for campanha, fator in zip(campanhas, fatores, strict=True)
-    ]
+    return linhas
 
 
 def _negocio_do_lead(

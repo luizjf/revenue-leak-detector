@@ -12,9 +12,10 @@ dev = [
     "ruff>=0.9",
     "pytest>=8.0",
     "numpy>=2.2",
-    "pandas>=3.0",
 ]
-# numpy entrou na 1.6 (gerador); pandas entra na 1.7 (exportador).
+# numpy entrou na 1.6 (gerador). pandas foi REMOVIDO: o exportador usa o
+# `csv` da stdlib, que da controle exato de separador, decimal e aspas —
+# DataFrame faria coercao silenciosa de tipo.
 # A entrar: duckdb, dbt-duckdb, sqlfluff (Fase 2) · streamlit (Fase 4).
 
 [tool.ruff]

@@ -11,17 +11,20 @@ recriá-la.
 
 ```
 raw/
-├── conta_001/
-│   ├── meta_ads_insights_pagina_1.json   resposta paginada da Graph API
-│   ├── meta_ads_insights_pagina_2.json
+├── acme_odonto/
+│   ├── meta_ads_insights_pagina_01.json   resposta paginada da Graph API
+│   ├── meta_ads_insights_pagina_02.json
 │   ├── crm_negocios.csv                  export do CRM
 │   ├── crm_contatos.csv
 │   ├── crm_atividades.csv
 │   └── financeiro_margens.csv            planilha do financeiro
-├── conta_002/  …  └── conta_012/
+├── belaforma_estetica/  …  └── solar_energia_ma/
 ```
 
-Doze contas, cerca de 29 MB. O conteúdo é sujo de propósito: número gravado como
+Doze contas, cerca de 29 MB. A pasta leva o id da conta, nao um numero de
+sequencia: quem abre o repositorio entende `solar_energia_ma/` sem consultar
+tabela nenhuma. A pagina tem zero a esquerda porque sao ~15 por conta, e sem
+isso a ordem alfabetica seria 1, 10, 11, 2. O conteúdo é sujo de propósito: número gravado como
 string, timestamp ISO com fuso `-03:00`, UTM em caixas inconsistentes, contatos
 duplicados, `campaign_source` nulo, paginação com cursor, CSV com ponto e vírgula
 e decimal com vírgula. Se o dado nascesse limpo, a camada de transformação não
